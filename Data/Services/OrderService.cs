@@ -112,6 +112,15 @@ namespace Nettbutikk.Data.Services
         {
             var orders = _webStoreContext.Orders.Where(o => o.Id.ToString().Equals(userId));
             _webStoreContext.Orders.RemoveRange(orders);
+
+            var relations = new List<ProductOrderRelation>();
+            foreach(var order in orders)
+            {
+                var collection = _webStoreContext.ProductOrderRelations.Where(r => r.OrderId == order.Id);
+                relations.AddRange(collection); 
+            }
+
+            _webStoreContext.ProductOrderRelations.RemoveRange(relations);
             await _webStoreContext.SaveChangesAsync();
         }
 
