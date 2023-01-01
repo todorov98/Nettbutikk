@@ -101,13 +101,18 @@ namespace Nettbutikk.Data.Services
 
             var cancelConfirmation = order.CancelOrder();
 
-            if (await _userManager.IsInRoleAsync(user, ApplicationRoles.Admin))
-                cancelConfirmation.CancelledByAdmin = true;
-
-            else cancelConfirmation.CancelledByAdmin = false;
+            cancelConfirmation.CancelledByAdmin = await _userManager
+                .IsInRoleAsync(user, ApplicationRoles.Admin);
 
             await _webStoreContext.SaveChangesAsync();
             return cancelConfirmation;
+        }
+
+        public async Task DeleteAllOrdersForDeletedUser(string userId)
+        {
+            var orders = _webStoreContext.Orders.Where(o => o.Id.ToString().Equals(userId));
+            _webStoreContext.Orders.RemoveRange(orders);
+            await _webStoreContext.SaveChangesAsync();
         }
 
         public Task<Order> GetOrderOnId(string id)
@@ -199,6 +204,19 @@ namespace Nettbutikk.Data.Services
             }
 
             return orderDTOs;
+        }
+
+        public async Task<AdvanceOrderStageConfirmation> AdvanceOrderStage(string orderId, UserEntity user)
+        {
+            var order = _webStoreContext.Orders.FirstOrDefault(o => o.Id.ToString().Equals(orderId))
+                ?? throw new Exception("Order not found.");
+
+            var advancedByAdmin = await _userManager.IsInRoleAsync(user, ApplicationRoles.Admin);
+
+            var advancedStageConfirmation = order.AdvanceStage(advancedByAdmin);
+
+            await _webStoreContext.SaveChangesAsync();
+            return advancedStageConfirmation;
         }
     }
 }

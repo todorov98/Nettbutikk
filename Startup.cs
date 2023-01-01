@@ -34,7 +34,7 @@ namespace Nettbutikk
 
             var roleManager = provider.GetRequiredService<RoleManager<RoleEntity>>();
 
-            string[] roleNames = { "Admin", "Customer" };
+            string[] roleNames = { ApplicationRoles.Admin, ApplicationRoles.Customer };
 
             IdentityResult identityResult;
             foreach (var role in roleNames)
@@ -46,7 +46,7 @@ namespace Nettbutikk
                     {
                         Id = Guid.NewGuid().ToString(),
                         Name = role,
-                        Code = role.Equals("Admin") ? ApplicationRoles.AdminRoleCode : ApplicationRoles.CustomerRoleCode
+                        Code = role.Equals(ApplicationRoles.Admin) ? ApplicationRoles.AdminRoleCode : ApplicationRoles.CustomerRoleCode
                     };
 
                     identityResult = roleManager.CreateAsync(roleEntity).Result;

@@ -105,14 +105,14 @@ namespace Nettbutikk.Controllers
         [HttpDelete]
         [Authorize]
         [Route("deleteUser")]
-        public async Task<IActionResult> DeleteUser([FromBody] string username)
+        public async Task<IActionResult> DeleteUser([FromBody] UsernameIdentificationDTO dto)
         {
             try
             {
                 var user = await _userContextService.GetCurrentUserOnHttpContext(HttpContext)
                     ?? throw new Exception("User not found");
 
-                var receipt = _identityService.DeleteUser(username, user);
+                var receipt = _identityService.DeleteUser(dto.Username, user);
                 var response = JsonConvert.SerializeObject(receipt);
                 return Ok(response);
             }

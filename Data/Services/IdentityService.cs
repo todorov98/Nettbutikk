@@ -21,12 +21,13 @@ namespace Nettbutikk.Data.Services
         private readonly UserManager<UserEntity> _userManager;
         private readonly DtoMapperService _dtoMapperService;
         private readonly UserFactory _userFactory;
+        private readonly OrderService _orderService;
         private readonly IConfiguration _configuration;
         private readonly SignInManager<UserEntity> _signInManager;
         private readonly DeleteUserReceiptFactory _deleteUserReceiptFactory;
 
         public IdentityService(IdentityContext context, UserManager<UserEntity> userManager, DtoMapperService dtoMapperService,
-            UserFactory userFactory, IConfiguration configuration,
+            UserFactory userFactory, IConfiguration configuration, OrderService orderService,
             SignInManager<UserEntity> signInManager, DeleteUserReceiptFactory deleteUserReceiptFactory)
         {
             _context = context;
@@ -36,6 +37,7 @@ namespace Nettbutikk.Data.Services
             _configuration = configuration;
             _signInManager = signInManager;
             _deleteUserReceiptFactory = deleteUserReceiptFactory;
+            _orderService = orderService;
         }
 
         /// <summary>
@@ -110,10 +112,11 @@ namespace Nettbutikk.Data.Services
 
             if (result.Succeeded)
             {
+                await _orderService.DeleteAllOrdersForDeletedUser(userToDelete.Id);
                 return _deleteUserReceiptFactory.CreateDeleteUserReceipt(username, deletedByAdmin);
             }
 
-            else throw new Exception("Delete user operation failed.");
+            else throw new Exception("Delete user failed.");
         }
 
         private async Task<string> CreateToken(UserEntity user)

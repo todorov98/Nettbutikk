@@ -114,8 +114,7 @@ namespace Nettbutikk.Controllers
                 var order = await _orderService.GetOrderOnId(id);
                 var orderDTO = await _dtoMapperService.MapToDTO<Order, OrderDTO>(order);
 
-                var response = JsonConvert.SerializeObject(orderDTO);
-                return Ok(response);
+                return Ok(orderDTO);
             }
 
             catch(Exception e)
@@ -147,13 +146,13 @@ namespace Nettbutikk.Controllers
                 {
                     var soldOutProduct = await _productService.GetProductOnId(e.ProductId);
 
-                    var response = JsonConvert.SerializeObject(new
+                    var response = new
                     {
                         Message = "Product you attempted to order is sold out. Order was cancelled.",
                         ProductName = soldOutProduct.Name,
                         ProductId = soldOutProduct.Id,
                         Date = DateTime.Now
-                    });
+                    };
 
                     return StatusCode(200, response);
                 }
@@ -179,17 +178,16 @@ namespace Nettbutikk.Controllers
         [Authorize(Roles = "Customer, Admin")]
         [Route("Orders/CancelOrder")]
         [HttpPut]
-        public async Task<IActionResult> CancelOrder([FromBody] OrderDTO orderDTO)
+        public async Task<IActionResult> CancelOrder([FromBody] string orderId)
         {
             try
             {
                 var user = await _userContextService.GetCurrentUserOnHttpContext(HttpContext)
                     ?? throw new Exception("User not found");
 
-                var cancelConfirmation = await _orderService.CancelOrder(orderDTO.Id.ToString(), user);
+                var cancelConfirmation = await _orderService.CancelOrder(orderId, user);
 
-                var response = JsonConvert.SerializeObject(cancelConfirmation);
-                return Ok(response);
+                return Ok(cancelConfirmation);
             }
 
             catch(Exception e)
@@ -201,9 +199,21 @@ namespace Nettbutikk.Controllers
         [Authorize(Roles = "Admin")]
         [Route("Orders/AdvanceStage")]
         [HttpPut]
-        public async Task<IActionResult> AdvanceOrderStage()
+        public async Task<IActionResult> AdvanceOrderStage([FromBody] string orderId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var user = await _userContextService.GetCurrentUserOnHttpContext(HttpContext)
+                    ?? throw new Exception("User not found");
+
+                var advanceOrderConfirmation = await _orderService.AdvanceOrderStage(orderId, user);
+                return Ok(advanceOrderConfirmation);
+            }
+
+            catch(Exception e)
+            {
+                return StatusCode(404, e.Message);
+            }
         }
     }
 }

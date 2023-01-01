@@ -14,5 +14,10 @@ namespace Nettbutikk.Models
             DeletedByAdmin = byAdmin;
             DeletedDate = DateTime.Now.AddMilliseconds(-5.0);
         }
+
+        public DeleteUserReceipt()
+        {
+
+        }
     }
 }

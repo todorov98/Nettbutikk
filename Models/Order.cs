@@ -57,31 +57,40 @@ namespace Nettbutikk.Models
         /// Advances the stage of an order as it is being processed by the store.
         /// </summary>
         /// <returns>Returns true if stage was updated, and false if stage was not updated.</returns>
-        public bool AdvanceStage()
+        public AdvanceOrderStageConfirmation AdvanceStage(bool advancedByAdmin)
         {
+            var previousStage = Stage;
+
             if (Stage.Equals(OrderStages.Received))
             {
                 Stage = OrderStages.InProcess;
-                return true;
             }
 
             else if (Stage.Equals(OrderStages.InProcess))
             {
                 Stage = OrderStages.Sent;
-                return true;
             }
 
             else if (Stage.Equals(OrderStages.Sent))
             {
                 Stage = OrderStages.Delivered;
                 DateFulfilled = DateTime.Now;
-                return true;
             }
 
             else if (Stage.Equals(OrderStages.Cancelled))
                 throw new Exception("Cancelled order can't be advanced.");
 
             else throw new Exception("Unexpected error. Couldn't advance stage, and none of the cases were true.");
+
+            var newStage = Stage;
+
+            return new AdvanceOrderStageConfirmation
+            {
+                OrderId = Id,
+                PreviousStage = previousStage,
+                NewStage = newStage,
+                AdvancedByAdmin = advancedByAdmin
+            };
         }
 
         /// <summary>
