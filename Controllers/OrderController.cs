@@ -2,7 +2,6 @@
 using Nettbutikk.Models;
 using System;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Nettbutikk.Data.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Nettbutikk.Data.Services;
@@ -35,14 +34,14 @@ namespace Nettbutikk.Controllers
         [Route("Orders/GetOrdersOnProduct")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetOrdersForCustomerOnProduct([FromBody] string id)
+        public async Task<IActionResult> GetOrdersForCustomerOnProduct([FromBody] IdIdentificationDTO dto)
         {
             try
             {
                 var user = await _userContextService.GetCurrentUserOnHttpContext(HttpContext)
                     ?? throw new Exception("User not found");
 
-                var orders = await _orderService.CheckIfProductWasOrderedBefore(user.Id, Guid.Parse(id));
+                var orders = await _orderService.CheckIfProductWasOrderedBefore(user.Id, Guid.Parse(dto.Id));
                 var orderDTOs = await _orderService.ConvertOrderListToOrderDTOs(orders);
 
                 return Ok(orderDTOs);
@@ -101,14 +100,14 @@ namespace Nettbutikk.Controllers
         [Route("Orders/GetOrder")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetOrder([FromBody] string id)
+        public async Task<IActionResult> GetOrder([FromBody] IdIdentificationDTO dto)
         {
             try
             {
                 var user = await _userContextService.GetCurrentUserOnHttpContext(HttpContext)
                     ?? throw new Exception("User not found");
 
-                var order = await _orderService.GetOrderOnId(id);
+                var order = await _orderService.GetOrderOnId(dto.Id);
                 var orderDTO = await _dtoMapperService.MapToDTO<Order, OrderDTO>(order);
 
                 return Ok(orderDTO);
@@ -175,14 +174,14 @@ namespace Nettbutikk.Controllers
         [Authorize(Roles = "Customer, Admin")]
         [Route("Orders/CancelOrder")]
         [HttpPut]
-        public async Task<IActionResult> CancelOrder([FromBody] string orderId)
+        public async Task<IActionResult> CancelOrder([FromBody] IdIdentificationDTO dto)
         {
             try
             {
                 var user = await _userContextService.GetCurrentUserOnHttpContext(HttpContext)
                     ?? throw new Exception("User not found");
 
-                var cancelConfirmation = await _orderService.CancelOrder(orderId, user);
+                var cancelConfirmation = await _orderService.CancelOrder(dto.Id, user);
 
                 return Ok(cancelConfirmation);
             }
@@ -196,14 +195,14 @@ namespace Nettbutikk.Controllers
         [Authorize(Roles = "Admin")]
         [Route("Orders/AdvanceStage")]
         [HttpPut]
-        public async Task<IActionResult> AdvanceOrderStage([FromBody] string orderId)
+        public async Task<IActionResult> AdvanceOrderStage([FromBody] IdIdentificationDTO dto)
         {
             try
             {
                 var user = await _userContextService.GetCurrentUserOnHttpContext(HttpContext)
                     ?? throw new Exception("User not found");
 
-                var advanceOrderConfirmation = await _orderService.AdvanceOrderStage(orderId, user);
+                var advanceOrderConfirmation = await _orderService.AdvanceOrderStage(dto.Id, user);
                 return Ok(advanceOrderConfirmation);
             }
 
