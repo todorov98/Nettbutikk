@@ -112,9 +112,8 @@ namespace Nettbutikk.Controllers
                 var user = await _userContextService.GetCurrentUserOnHttpContext(HttpContext)
                     ?? throw new Exception("User not found");
 
-                var receipt = _identityService.DeleteUser(dto.Username, user);
-                var response = JsonConvert.SerializeObject(receipt);
-                return Ok(response);
+                var receipt = await _identityService.DeleteUser(dto.Username, user);
+                return Ok(receipt);
             }
 
             catch(Exception e)

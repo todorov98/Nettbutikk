@@ -108,22 +108,6 @@ namespace Nettbutikk.Data.Services
             return cancelConfirmation;
         }
 
-        public async Task DeleteAllOrdersForDeletedUser(string userId)
-        {
-            var orders = _webStoreContext.Orders.Where(o => o.Id.ToString().Equals(userId));
-            _webStoreContext.Orders.RemoveRange(orders);
-
-            var relations = new List<ProductOrderRelation>();
-            foreach(var order in orders)
-            {
-                var collection = _webStoreContext.ProductOrderRelations.Where(r => r.OrderId == order.Id);
-                relations.AddRange(collection); 
-            }
-
-            _webStoreContext.ProductOrderRelations.RemoveRange(relations);
-            await _webStoreContext.SaveChangesAsync();
-        }
-
         public Task<Order> GetOrderOnId(string id)
         {
             var order = _webStoreContext.Orders

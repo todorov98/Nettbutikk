@@ -45,8 +45,7 @@ namespace Nettbutikk.Controllers
                 var orders = await _orderService.CheckIfProductWasOrderedBefore(user.Id, Guid.Parse(id));
                 var orderDTOs = await _orderService.ConvertOrderListToOrderDTOs(orders);
 
-                var response = JsonConvert.SerializeObject(orderDTOs);
-                return Ok(response);
+                return Ok(orderDTOs);
             }
 
             catch(Exception e)
@@ -68,8 +67,7 @@ namespace Nettbutikk.Controllers
                 var orders = await _orderService.GetAllCompletedOrdersOnCustomerId(user.Id);
                 var orderDTOs = await _orderService.ConvertOrderListToOrderDTOs(orders);
 
-                var response = JsonConvert.SerializeObject(orderDTOs);
-                return Ok(response);
+                return Ok(orderDTOs);
             }
 
             catch(Exception e)
@@ -91,8 +89,7 @@ namespace Nettbutikk.Controllers
                 var orders = await _orderService.GetAllOrdersOnUserId(user.Id);
                 var orderDTOs = await _orderService.ConvertOrderListToOrderDTOs(orders);
 
-                var response = JsonConvert.SerializeObject(orderDTOs);
-                return Ok(response);
+                return Ok(orderDTOs);
             }
 
             catch(Exception e)

@@ -85,19 +85,20 @@ namespace Nettbutikk
                 };
             });
 
-            //dependencies
+            //dependencies, services
             services.AddTransient<ILogger<Order>, Logger<Order>>();
-            services.AddTransient<ProductOrderRelationFactory>();
             services.AddTransient<DtoMapperService>();
             services.AddTransient<IdentityService>();
-            services.AddTransient<UserFactory>();
-            services.AddTransient<DeleteUserReceiptFactory>();
-            services.AddTransient<OrderFactory>();
             services.AddTransient<OrderService>();
             services.AddTransient<ProductService>();
-            services.AddTransient<UserRoleRelationFactory>();
             services.AddTransient<UserContextService>();
-            services.AddTransient<OrderReceiptFactory>();
+
+            //factories
+            services.AddSingleton<DeleteUserReceiptFactory>();
+            services.AddSingleton<OrderFactory>();
+            services.AddSingleton<UserFactory>();
+            services.AddSingleton<ProductOrderRelationFactory>();
+            services.AddSingleton<OrderReceiptFactory>();
             //--------------dependencies-------------
 
             services.AddControllers();

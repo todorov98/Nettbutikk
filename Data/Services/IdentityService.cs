@@ -112,7 +112,6 @@ namespace Nettbutikk.Data.Services
 
             if (result.Succeeded)
             {
-                await _orderService.DeleteAllOrdersForDeletedUser(userToDelete.Id);
                 return _deleteUserReceiptFactory.CreateDeleteUserReceipt(username, deletedByAdmin);
             }
 

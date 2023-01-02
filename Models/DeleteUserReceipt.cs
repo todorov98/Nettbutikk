@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Nettbutikk.Models
 {
+    [NotMapped]
     public class DeleteUserReceipt
     {
         public string DeletedUsername { get; set; }

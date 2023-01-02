@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
+[NotMapped]
 public class AdvanceOrderStageConfirmation
 {
     public Guid OrderId { get; set; }
