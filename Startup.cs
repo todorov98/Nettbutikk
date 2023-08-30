@@ -92,6 +92,7 @@ namespace Nettbutikk
             services.AddTransient<OrderService>();
             services.AddTransient<ProductService>();
             services.AddTransient<UserContextService>();
+            services.AddTransient<DiscountService>();
 
             //factories
             services.AddSingleton<DeleteUserReceiptFactory>();
@@ -102,6 +103,7 @@ namespace Nettbutikk
             //--------------dependencies-------------
 
             services.AddControllers();
+            services.AddSignalR(cfg => cfg.EnableDetailedErrors = true);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Nettbutikk", Version = "v1" });

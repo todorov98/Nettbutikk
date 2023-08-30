@@ -16,11 +16,14 @@ namespace Nettbutikk.Controllers
     {
         private readonly ProductService _productService;
         private readonly DtoMapperService _dtoMapperService;
+        private readonly DiscountService _discountService;
 
-        public ProductController(ProductService productService, DtoMapperService dtoMapperService)
+        public ProductController(ProductService productService, DtoMapperService dtoMapperService,
+            DiscountService discountService)
         {
             _productService = productService;
             _dtoMapperService = dtoMapperService;
+            _discountService = discountService;
         }
 
         [HttpGet]
@@ -49,16 +52,35 @@ namespace Nettbutikk.Controllers
             try
             {
                 var products = await _productService.GetAllProducts();
-                var dtos = new List<ProductDTO>();
+                var productDTOs = new List<ProductDTO>();
+                var discountDTOs = new List<DiscountDTO>();
 
                 foreach (var product in products)
-                    dtos.Add(await _dtoMapperService.MapToDTO<Product, ProductDTO>(product));
+                {
+                    productDTOs.Add(await _dtoMapperService.MapToDTO<Product, ProductDTO>(product));
+                    var hasDiscount = _discountService.CheckIfHasDiscount(product.Id);
 
-                return Ok(dtos);
+                    if (hasDiscount)
+                    {
+                        var dc = await _discountService.GetDiscountForProduct(product.Id);
+                        discountDTOs.Add(dc);
+                    }
+                }
+
+                var response = new
+                {
+                    Products = productDTOs,
+                    Discounts = discountDTOs
+                };
+
+                return Ok(response);
             }
 
             catch(ArgumentException e)
             {
+                if (e.Message.Equals("Discount not found"))
+                    return StatusCode(404, "Could not find discount for a product.");
+
                 return StatusCode(500, e.Message);
             }
 

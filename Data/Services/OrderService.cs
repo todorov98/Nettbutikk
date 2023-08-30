@@ -101,8 +101,7 @@ namespace Nettbutikk.Data.Services
 
             var cancelConfirmation = order.CancelOrder();
 
-            cancelConfirmation.CancelledByAdmin = await _userManager
-                .IsInRoleAsync(user, ApplicationRoles.Admin);
+            cancelConfirmation.CancelledByAdmin = await _userManager.IsInRoleAsync(user, ApplicationRoles.Admin);
 
             await _webStoreContext.SaveChangesAsync();
             return cancelConfirmation;

@@ -9,6 +9,7 @@ namespace Nettbutikk.Data
     {
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Discount> Discounts { get; set; }
         public DbSet<CancelOrderConfirmation> CancelOrderConfirmations { get; set; }
         public DbSet<ProductOrderRelation> ProductOrderRelations { get; set; }
 
@@ -53,7 +54,11 @@ namespace Nettbutikk.Data
                 Math.Round(167.59, 2), Count = 18, Currency = StoreCurrency.Currency},
 
                 new Product { Id = Guid.NewGuid(), Category = Categories.SportsPants, Name = "Adidas F99 Pants Long", Description = "Nice and " +
-                "comfortable sports pants by Adidas.", Price = Math.Round(34.99, 2), Count = 21, Currency = StoreCurrency.Currency}
+                "comfortable sports pants by Adidas.", Price = Math.Round(34.99, 2), Count = 21, Currency = StoreCurrency.Currency},
+
+                new Product { Id = Guid.NewGuid(), Category = Categories.Bag, Name = "Nike Elastico Bag xc21", Description = "Solid and hight " +
+                "quality sports bag from Nike.", Price = Math.Round(22.99, 2), Count = 25, Currency = StoreCurrency.Currency
+                }
             );
         }
     }
