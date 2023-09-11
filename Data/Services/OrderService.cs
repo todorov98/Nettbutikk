@@ -160,7 +160,7 @@ namespace Nettbutikk.Data.Services
             {
                 foreach (var product in dto.Products)
                 {
-                    if (product.Count < 0)
+                    if (product.Count <= 0)
                         throw new Exception("Invalid product count.");
 
                     var retrievedProduct = _webStoreContext.Products.FirstOrDefault(p => p.Name.Equals(product.Name))
