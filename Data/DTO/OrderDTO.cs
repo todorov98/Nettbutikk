@@ -11,6 +11,7 @@ namespace Nettbutikk.Data.DTO
         public DateTime DateFulfilled { get; set; }
         public double Price { get; set; }
         public string Stage { get; set; }
+        public bool WantsPartialDelivery { get; set; }
         public List<ProductDTO> Products { get; set; }
     }
 }

@@ -21,6 +21,7 @@ namespace Nettbutikk.Models
         public DateTime? DateFulfilled { get; set; }
         public double Price { get; set; }
         public string Stage { get; set; }
+        public bool WantsPartialDelivery { get; set; }
         [JsonIgnore]
         public string UserId { get; set; }
         [JsonIgnore]

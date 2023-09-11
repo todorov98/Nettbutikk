@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Nettbutikk.Data.Events;
 using Nettbutikk.Models;
 using Nettbutikk.State;
 using System;
@@ -12,6 +13,9 @@ namespace Nettbutikk.Data
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<CancelOrderConfirmation> CancelOrderConfirmations { get; set; }
         public DbSet<ProductOrderRelation> ProductOrderRelations { get; set; }
+        public DbSet<PartialDelivery> PartialDeliveries { get; set; }
+        public DbSet<PartialDeliveryProductRelation> PartialDeliveryProductRelations { get; set; }
+        public DbSet<Event> Events { get; set; }
 
         public WebStoreContext(DbContextOptions<WebStoreContext> options)
             : base(options)

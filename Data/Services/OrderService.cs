@@ -23,6 +23,8 @@ namespace Nettbutikk.Data.Services
         private readonly OrderReceiptFactory _orderReceiptFactory;
         private readonly OrderFactory _orderFactory;
         private readonly UserManager<UserEntity> _userManager;
+        private readonly PartialDeliveryFactory _partialDeliveryFactory;
+        private readonly PartialDeliveryProductRelationFactory _partialDeliveryProductRelationFactory;
 
         public OrderService
         (
@@ -31,7 +33,9 @@ namespace Nettbutikk.Data.Services
             ProductOrderRelationFactory productOrderRelationFactory, 
             OrderReceiptFactory orderReceiptFactory,
             OrderFactory orderFactory,
-            UserManager<UserEntity> userManager
+            UserManager<UserEntity> userManager,
+            PartialDeliveryFactory partialDeliveryFactory,
+            PartialDeliveryProductRelationFactory partialDeliveryProductRelationFactory
         )
 
         {
@@ -41,6 +45,8 @@ namespace Nettbutikk.Data.Services
             _orderReceiptFactory = orderReceiptFactory;
             _orderFactory = orderFactory;
             _userManager = userManager;
+            _partialDeliveryFactory = partialDeliveryFactory;
+            _partialDeliveryProductRelationFactory = partialDeliveryProductRelationFactory;
         }
         
         /// <summary>
@@ -148,23 +154,45 @@ namespace Nettbutikk.Data.Services
         public async Task<OrderReceipt> PlaceOrder(OrderDTO dto, UserEntity user)
         {
             var orderEntity = await _orderFactory.CreateAndInitializeOrderFromDTO(dto, user.Id);
+            var partialDelivery = _partialDeliveryFactory.CreatePartialDelivery();
 
             if (orderEntity is not null)
             {
                 foreach (var product in dto.Products)
                 {
-                    if (product.Count <= 0)
+                    if (product.Count < 0)
                         throw new Exception("Invalid product count.");
 
                     var retrievedProduct = _webStoreContext.Products.FirstOrDefault(p => p.Name.Equals(product.Name))
                         ?? throw new Exception("Product not found.");
 
                     if (retrievedProduct.Count == 0 || (retrievedProduct.Count - product.Count < 0))
-                        throw new SoldOutException("Product sold out.", orderEntity.Id.ToString(), retrievedProduct.Id.ToString());
+                    {
+                        if (orderEntity.WantsPartialDelivery)
+                        {
+                            partialDelivery.PartialDeliveryProductRelations.Add(_partialDeliveryProductRelationFactory
+                                .CreatePartialDeliveryProductRelation(partialDelivery, retrievedProduct, product.Count));
+                        }
 
-                    retrievedProduct.Count -= product.Count;
-                    orderEntity.ProductOrderRelations.Add(_productOrderRelationFactory
-                        .CreateRelation(retrievedProduct, orderEntity, product.Count));
+                        else throw new SoldOutException("Product sold out.", orderEntity.Id.ToString(), retrievedProduct.Id.ToString());
+                    }
+
+                    else
+                    {
+                        retrievedProduct.Count -= product.Count;
+                        orderEntity.ProductOrderRelations.Add(_productOrderRelationFactory
+                            .CreateRelation(retrievedProduct, orderEntity, product.Count));
+                    } 
+                }
+
+                if (orderEntity.WantsPartialDelivery && partialDelivery.PartialDeliveryProductRelations.Any())
+                {
+                    partialDelivery.Order = orderEntity;
+                    partialDelivery.OrderId = orderEntity.Id;
+                    partialDelivery.User = user;
+                    partialDelivery.UserId = user.Id;
+
+                    _webStoreContext.PartialDeliveries.Add(partialDelivery);
                 }
 
                 orderEntity.CalculatePrize();

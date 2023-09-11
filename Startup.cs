@@ -14,6 +14,7 @@ using Nettbutikk.Data.Services;
 using Nettbutikk.Factories;
 using Nettbutikk.Models;
 using Nettbutikk.State;
+using Nettbutikk.Workers;
 using System;
 using System.Text;
 
@@ -100,6 +101,14 @@ namespace Nettbutikk
             services.AddSingleton<UserFactory>();
             services.AddSingleton<ProductOrderRelationFactory>();
             services.AddSingleton<OrderReceiptFactory>();
+            services.AddSingleton<ProductFactory>();
+            services.AddSingleton<EventFactory>();
+            services.AddSingleton<PartialDeliveryFactory>();
+            services.AddSingleton<PartialDeliveryProductRelationFactory>();
+
+            //hosted services
+            services.AddHostedService<WebstoreProductDelivery>();
+            services.AddHostedService<EventListener>();
             //--------------dependencies-------------
 
             services.AddControllers();
