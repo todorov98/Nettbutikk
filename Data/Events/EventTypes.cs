@@ -8,5 +8,6 @@ namespace Nettbutikk.Data.Events
     public static class EventTypes
     {
         public static readonly string ProductArrivedEvent = "ProductArrivedEvent";
+        public static readonly string DeliveryLateEvent = "DeliveryLateEvent";
     }
 }

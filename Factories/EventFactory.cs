@@ -1,5 +1,6 @@
 ﻿using Nettbutikk.Data.Events;
 using Nettbutikk.Models;
+using Nettbutikk.Models.EventModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,28 @@ namespace Nettbutikk.Factories
 {
     public class EventFactory
     {
-        public Event CreateProductsArrivedEvent(string eventName, List<Product> products)
+        public Event CreateDeliveryEvent(string eventName, List<Product> products, DateTime? expectedDate = null)
         {
-            string data = JsonSerializer.Serialize(products);
+            IEvent evt;
+
+            if (expectedDate is null)
+                evt = new ProductArrivedEvent()
+                {
+                    DateCreated = DateTime.UtcNow,
+                    Products = products
+                };
+
+            else
+            {
+                evt = new DeliveryLateEvent()
+                {
+                    Expected = (DateTime)expectedDate,
+                    DateCreated = DateTime.UtcNow,
+                    Products = products
+                };
+            }
+
+            string data = JsonSerializer.Serialize(evt);
 
             return new Event()
             {

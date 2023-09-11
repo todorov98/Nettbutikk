@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Nettbutikk.Data.Events;
 using Nettbutikk.Models;
+using Nettbutikk.Models.EventModels;
 using Nettbutikk.State;
 using System;
 

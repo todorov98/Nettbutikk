@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Nettbutikk.Data.Events
+namespace Nettbutikk.Data.Services
 {
-    public interface IEvent
+    public class PartialDeliveryService
     {
 
     }

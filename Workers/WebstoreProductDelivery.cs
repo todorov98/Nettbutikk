@@ -2,6 +2,7 @@
 using Nettbutikk.Data;
 using Nettbutikk.Data.Events;
 using Nettbutikk.Factories;
+using Nettbutikk.Models.EventModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,16 +32,28 @@ namespace Nettbutikk.Workers
 
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var rnd = new Random();
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(20000);
+                await Task.Delay(5000);
 
                 try
                 {
-                    var arrivedProducts = _productFactory.CreateProducts();
-                    await _context.Products.AddRangeAsync(arrivedProducts);
+                    var products = _productFactory.CreateProducts();
+                    Event evt;
 
-                    var evt = _eventFactory.CreateProductsArrivedEvent("ProductArrivedEvent", arrivedProducts);
+                    // creates possibility of product being late, which triggers events, if true product is late
+                    if (rnd.Next(1, 20) > 13)
+                    {
+                        var expectedDate = DateTime.UtcNow.AddMinutes(3.0);
+                        evt = _eventFactory.CreateDeliveryEvent(EventTypes.DeliveryLateEvent, products);
+                        continue;
+                    }
+
+                    await _context.Products.AddRangeAsync(products);
+
+                    evt = _eventFactory.CreateDeliveryEvent(EventTypes.ProductArrivedEvent, products);
                     await _context.Events.AddAsync(evt);
 
                     await _context.SaveChangesAsync();
