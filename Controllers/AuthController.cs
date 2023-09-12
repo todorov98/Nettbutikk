@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Nettbutikk.Data.Services;
 using Newtonsoft.Json;
+using Nettbutikk.State;
 
 namespace Nettbutikk.Controllers
 {
@@ -15,11 +16,13 @@ namespace Nettbutikk.Controllers
     {
         private readonly IdentityService _identityService;
         private readonly UserContextService _userContextService;
+        private readonly PartialDeliveryService _partialDeliveryService;
 
-        public AuthController(IdentityService identityService, UserContextService userContextService)
+        public AuthController(IdentityService identityService, UserContextService userContextService, PartialDeliveryService partialDeliveryService)
         {
             _identityService = identityService;
             _userContextService = userContextService;
+            _partialDeliveryService = partialDeliveryService;
         }
 
         [HttpPost]
@@ -61,7 +64,19 @@ namespace Nettbutikk.Controllers
             {
                 var token = await _identityService.LoginUser(loginDTO);
 
-                return Ok(token);
+                var user = await _userContextService.GetCurrentUserOnHttpContext(HttpContext)
+                    ?? throw new Exception("User not found");
+
+                var partials = _partialDeliveryService.CheckIfUserHasPartialDeliveries(user.Id);
+
+                var res = new
+                {
+                    token = token,
+                    hasPartials = partials is not null ? true : false, // if true, user has partial delivery pending, therefore he is to connect to hub
+                    hubUrl = Urls.PartialDeliveryHubUrl
+                };
+
+                return Ok(res);
             }
 
             catch(Exception e)

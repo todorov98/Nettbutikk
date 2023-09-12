@@ -171,7 +171,10 @@ namespace Nettbutikk.Data.Services
                         if (orderEntity.WantsPartialDelivery)
                         {
                             partialDelivery.PartialDeliveryProductRelations.Add(_partialDeliveryProductRelationFactory
-                                .CreatePartialDeliveryProductRelation(partialDelivery, retrievedProduct, product.Count));
+                                .CreatePartialDeliveryProductRelation(partialDelivery, retrievedProduct, 
+                                retrievedProduct.Count == 0 ? product.Count : product.Count - retrievedProduct.Count));
+
+                            retrievedProduct.Count = 0;
                         }
 
                         else throw new SoldOutException("Product sold out.", orderEntity.Id.ToString(), retrievedProduct.Id.ToString());

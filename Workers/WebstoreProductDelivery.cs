@@ -4,11 +4,13 @@ using Nettbutikk.Data.Events;
 using Nettbutikk.Factories;
 using Nettbutikk.Models.EventModels;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using Nettbutikk.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Nettbutikk.Workers
 {
@@ -40,21 +42,28 @@ namespace Nettbutikk.Workers
 
                 try
                 {
-                    var products = _productFactory.CreateProducts();
-                    Event evt;
+                    Event lateEvt;
+                    Event arrivedEvt;
+                    var products = _context.Products.AsQueryable().AsNoTracking().ToList();
 
                     // creates possibility of product being late, which triggers events, if true product is late
                     if (rnd.Next(1, 20) > 13)
                     {
                         var expectedDate = DateTime.UtcNow.AddMinutes(3.0);
-                        evt = _eventFactory.CreateDeliveryEvent(EventTypes.DeliveryLateEvent, products);
-                        continue;
+                        lateEvt = _eventFactory.CreateDeliveryEvent(EventTypes.DeliveryLateEvent, products);
+                        await _context.Events.AddAsync(lateEvt);
+                        await _context.SaveChangesAsync();
+
+                        await Task.Delay(3000);
                     }
 
-                    await _context.Products.AddRangeAsync(products);
+                    await _context.Products.ForEachAsync((product) => { product.Count++; });
 
-                    evt = _eventFactory.CreateDeliveryEvent(EventTypes.ProductArrivedEvent, products);
-                    await _context.Events.AddAsync(evt);
+                    foreach (var product in _context.Products)
+                        product.Count++;
+
+                    arrivedEvt = _eventFactory.CreateDeliveryEvent(EventTypes.ProductArrivedEvent, products);
+                    await _context.Events.AddAsync(arrivedEvt);
 
                     await _context.SaveChangesAsync();
                 }
@@ -63,7 +72,6 @@ namespace Nettbutikk.Workers
                 {
                     throw new Exception(ex.Message + ". Something failed when receiving products to the store and storing them to database.");
                 }
-                
             }
 
             throw new NotImplementedException();

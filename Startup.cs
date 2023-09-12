@@ -17,6 +17,8 @@ using Nettbutikk.State;
 using Nettbutikk.Workers;
 using System;
 using System.Text;
+using Microsoft.AspNetCore.SignalR;
+using Nettbutikk.SignalR;
 
 namespace Nettbutikk
 {
@@ -142,6 +144,8 @@ namespace Nettbutikk
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<PartialDeliveryHub>("/hubs/partialDelivery");
+                endpoints.MapHub<CustomerServiceHub>("/hubs/customerService");
             });
         }
     }
