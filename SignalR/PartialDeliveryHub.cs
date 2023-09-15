@@ -28,10 +28,7 @@ namespace Nettbutikk.SignalR
         [Authorize]
         public override Task OnConnectedAsync()
         {
-            var httpContext = Context.GetHttpContext()
-                ?? throw new Exception("Result is null. Connection not associated with HTTP request.");
-
-            var user = _userContextService.GetCurrentUserOnHttpContext(httpContext).Result;
+            var user = GetCurrentConnectingUser();
             _connectedUsers.Add(user, Context.ConnectionId);
 
             return base.OnConnectedAsync();
@@ -39,13 +36,18 @@ namespace Nettbutikk.SignalR
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            var httpContext = Context.GetHttpContext()
-               ?? throw new Exception("Result is null. Connection not associated with HTTP request.");
-
-            var user = _userContextService.GetCurrentUserOnHttpContext(httpContext).Result;
+            var user = GetCurrentConnectingUser();
             _connectedUsers.Remove(user);
 
             return base.OnDisconnectedAsync(exception);
+        }
+
+        private UserEntity GetCurrentConnectingUser()
+        {
+            var httpContext = Context.GetHttpContext()
+               ?? throw new Exception("Result is null. Connection not associated with HTTP request.");
+
+            return _userContextService.GetCurrentUserOnHttpContext(httpContext).Result;
         }
 
         public async Task NotifyUserOfSentPartial(PartialDelivery partial)
