@@ -34,6 +34,7 @@ namespace Nettbutikk.SignalR
             return base.OnConnectedAsync();
         }
 
+        [Authorize]
         public override Task OnDisconnectedAsync(Exception exception)
         {
             var user = GetCurrentConnectingUser();
