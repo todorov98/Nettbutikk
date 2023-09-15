@@ -25,7 +25,7 @@ namespace Nettbutikk.Workers
             while (!stoppingToken.IsCancellationRequested)
             {
                 var evts = _context.Events.Where(evt => !evt.IsHandled); // gets unhandled events
-
+                evts.ToList();
                 // here we should send the events to some signalR service that can transmit the messages onward to the appropriate receivers
             }
 

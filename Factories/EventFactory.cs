@@ -11,11 +11,11 @@ namespace Nettbutikk.Factories
 {
     public class EventFactory
     {
-        public Event CreateDeliveryEvent(string eventName, List<Product> products, DateTime? expectedDate = null)
+        public Event CreateDeliveryEvent(string eventName, List<Product> products, Guid? partialId = null)
         {
             IEvent evt;
 
-            if (expectedDate is null)
+            if (partialId is null)
                 evt = new ProductArrivedEvent()
                 {
                     DateCreated = DateTime.UtcNow,
@@ -26,9 +26,8 @@ namespace Nettbutikk.Factories
             {
                 evt = new DeliveryLateEvent()
                 {
-                    Expected = (DateTime)expectedDate,
-                    DateCreated = DateTime.UtcNow,
-                    Products = products
+                    Id = Guid.NewGuid(),
+                    PartialDeliveryId = (Guid)partialId
                 };
             }
 

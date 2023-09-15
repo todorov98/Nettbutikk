@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nettbutikk.Factories;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace Nettbutikk.Models
         [Key]
         public Guid Id { get; set; }
         public Guid OrderId { get; set; }
+        public DateTime Expected { get; set; }
+        public DateTime DateCreated { get; set; }
         public Order Order { get; set; }
         [JsonIgnore]
         public string UserId { get; set; }
@@ -24,6 +27,7 @@ namespace Nettbutikk.Models
         {
             Id = Guid.NewGuid();
             IsFulfilled = false;
+            DateCreated = DateTime.UtcNow;
         }
 
         [JsonIgnore]
@@ -37,6 +41,15 @@ namespace Nettbutikk.Models
         public bool Exists()
         {
             throw new NotImplementedException();
+        }
+
+        public void AddProducts(Dictionary<Product, int> productsWithCount)
+        {
+            foreach (var product in productsWithCount)
+            {
+                var relation = PartialDeliveryProductRelationFactory.CreatePartialDeliveryProductRelation(this, product.Key, product.Value);
+                PartialDeliveryProductRelations.Add(relation);
+            }
         }
     }
 }

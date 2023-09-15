@@ -24,7 +24,6 @@ namespace Nettbutikk.Data.Services
         private readonly OrderFactory _orderFactory;
         private readonly UserManager<UserEntity> _userManager;
         private readonly PartialDeliveryFactory _partialDeliveryFactory;
-        private readonly PartialDeliveryProductRelationFactory _partialDeliveryProductRelationFactory;
 
         public OrderService
         (
@@ -34,8 +33,7 @@ namespace Nettbutikk.Data.Services
             OrderReceiptFactory orderReceiptFactory,
             OrderFactory orderFactory,
             UserManager<UserEntity> userManager,
-            PartialDeliveryFactory partialDeliveryFactory,
-            PartialDeliveryProductRelationFactory partialDeliveryProductRelationFactory
+            PartialDeliveryFactory partialDeliveryFactory
         )
 
         {
@@ -46,7 +44,6 @@ namespace Nettbutikk.Data.Services
             _orderFactory = orderFactory;
             _userManager = userManager;
             _partialDeliveryFactory = partialDeliveryFactory;
-            _partialDeliveryProductRelationFactory = partialDeliveryProductRelationFactory;
         }
         
         /// <summary>
@@ -170,7 +167,7 @@ namespace Nettbutikk.Data.Services
                     {
                         if (orderEntity.WantsPartialDelivery)
                         {
-                            partialDelivery.PartialDeliveryProductRelations.Add(_partialDeliveryProductRelationFactory
+                            partialDelivery.PartialDeliveryProductRelations.Add(PartialDeliveryProductRelationFactory
                                 .CreatePartialDeliveryProductRelation(partialDelivery, retrievedProduct, 
                                 retrievedProduct.Count == 0 ? product.Count : product.Count - retrievedProduct.Count));
 

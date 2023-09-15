@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 
 namespace Nettbutikk.Factories
 {
-    public class PartialDeliveryProductRelationFactory
+    public static class PartialDeliveryProductRelationFactory
     {
-        public PartialDeliveryProductRelationFactory()
-        {
-
-        }
-
-        public PartialDeliveryProductRelation CreatePartialDeliveryProductRelation(PartialDelivery partialDelivery, Product product, int count)
+        public static PartialDeliveryProductRelation CreatePartialDeliveryProductRelation(PartialDelivery partialDelivery, Product product, int count)
         {
             return new PartialDeliveryProductRelation(partialDelivery, product, count);
         }

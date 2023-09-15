@@ -10,8 +10,7 @@ namespace Nettbutikk.Models.EventModels
     [Serializable]
     public class DeliveryLateEvent : IEvent
     {
-        public DateTime Expected { get; set; }
-        public DateTime DateCreated { get; set; }
-        public List<Product> Products { get; set; }
+        public Guid Id { get; set; }
+        public Guid PartialDeliveryId { get; set; }
     }
 }

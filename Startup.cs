@@ -107,7 +107,6 @@ namespace Nettbutikk
             services.AddSingleton<ProductFactory>();
             services.AddSingleton<EventFactory>();
             services.AddSingleton<PartialDeliveryFactory>();
-            services.AddSingleton<PartialDeliveryProductRelationFactory>();
 
             //hosted services
             services.AddHostedService<WebstoreProductDelivery>();
