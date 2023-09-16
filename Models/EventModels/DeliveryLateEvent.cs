@@ -11,6 +11,6 @@ namespace Nettbutikk.Models.EventModels
     public class DeliveryLateEvent : IEvent
     {
         public Guid Id { get; set; }
-        public Guid PartialDeliveryId { get; set; }
+        public List<Product> Products { get; set; } // products that are late
     }
 }

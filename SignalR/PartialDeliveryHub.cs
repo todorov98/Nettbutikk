@@ -51,18 +51,18 @@ namespace Nettbutikk.SignalR
             return _userContextService.GetCurrentUserOnHttpContext(httpContext).Result;
         }
 
-        public async Task NotifyUserOfSentPartial(PartialDelivery partial)
+        public async Task NotifyUserOfSentPartial(Order order)
         {
-            if (!partial.IsFulfilled)
+            if (!order.PartialDelivery.IsFulfilled)
                 throw new Exception("Can not notify user of sent partial delivery when partial delivery is not fulfilled");
 
-            var user = _connectedUsers.Where(e => e.Key.Id.Equals(partial.Id.ToString())).FirstOrDefault().Key
+            var user = _connectedUsers.Where(e => e.Key.Id.Equals(order.PartialDelivery.Id.ToString())).FirstOrDefault().Key
                 ?? throw new Exception("user in partial delivery argument is not connected to this hub.");
 
-            if (user.Id.Equals(partial.UserId))
+            if (user.Id.Equals(order.PartialDelivery.UserId))
             {
-                var queryable = partial.PartialDeliveryProductRelations.AsQueryable();
-                var productDTOs = queryable.Where(pd => pd.PartialDeliveryId.ToString().Equals(partial.Id))
+                var queryable = order.PartialDelivery.PartialDeliveryProductRelations.AsQueryable();
+                var productDTOs = queryable.Where(pd => pd.PartialDeliveryId.ToString().Equals(order.PartialDelivery.Id))
                     .Include(pdpr => pdpr.Product)
                     .Select(o => new ProductDTO
                     {
@@ -76,14 +76,14 @@ namespace Nettbutikk.SignalR
 
                 var response = new
                 {
-                    Id = partial.Id,
+                    Id = order.PartialDelivery.Id,
                     Products = productDTOs,
-                    orderId = partial.OrderId,
-                    DateCreated = partial.DateCreated,
-                    Expected = partial.Expected
+                    orderId = order.Id,
+                    DateCreated = order.PartialDelivery.DateCreated,
+                    Expected = order.PartialDelivery.Expected
                 };
 
-                var clientProxy = Clients.User(partial.UserId);
+                var clientProxy = Clients.User(order.PartialDelivery.UserId);
                 await clientProxy.SendAsync("ReceivePartialDeliveryNotification", response);
             }
 

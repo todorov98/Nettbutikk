@@ -11,25 +11,27 @@ namespace Nettbutikk.Factories
 {
     public class EventFactory
     {
-        public Event CreateDeliveryEvent(string eventName, List<Product> products, Guid? partialId = null)
+        public Event CreateDeliveryEvent(string eventName, List<Product> products)
         {
             IEvent evt;
 
-            if (partialId is null)
+            if (eventName.Equals(EventTypes.ProductArrivedEvent))
                 evt = new ProductArrivedEvent()
                 {
                     DateCreated = DateTime.UtcNow,
                     Products = products
                 };
 
-            else
+            else if (eventName.Equals(EventTypes.DeliveryLateEvent))
             {
                 evt = new DeliveryLateEvent()
                 {
                     Id = Guid.NewGuid(),
-                    PartialDeliveryId = (Guid)partialId
+                    Products = products
                 };
             }
+
+            else throw new Exception("Invalid event type");
 
             string data = JsonSerializer.Serialize(evt);
 

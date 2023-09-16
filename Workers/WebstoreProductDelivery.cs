@@ -25,6 +25,7 @@ namespace Nettbutikk.Workers
         private ProductFactory _productFactory;
         private EventFactory _eventFactory;
         private PartialDeliveryFactory _partialDeliveryFactory;
+        private int DeliveryQuantityForProduct = 1;
 
         public WebstoreProductDelivery(WebStoreContext webStoreContext, ProductFactory productFactory, EventFactory eventFactory, PartialDeliveryFactory partialDeliveryFactory)
         {
@@ -51,19 +52,15 @@ namespace Nettbutikk.Workers
                     // creates possibility of product being late, which triggers events, if true product is late
                     if (rnd.Next(1, 20) > 13)
                     {
-                        var partial = _partialDeliveryFactory.CreatePartialDelivery();
-
                         var expectedDate = DateTime.UtcNow.AddMinutes(3.0);
 
                         var dictionary = new Dictionary<Product, int>();
                         products.ForEach((p) => 
                         {
-                            dictionary.Add(p, 1); //hardcoded a product delivery count of only 1
+                            dictionary.Add(p, DeliveryQuantityForProduct); //hardcoded a product delivery count of only 1 for all products delivered
                         });
 
-                        partial.AddProducts(dictionary);
-
-                        lateEvt = _eventFactory.CreateDeliveryEvent(EventTypes.DeliveryLateEvent, products, partial.Id);
+                        lateEvt = _eventFactory.CreateDeliveryEvent(EventTypes.DeliveryLateEvent, products);
                         await _context.Events.AddAsync(lateEvt);
                         await _context.SaveChangesAsync();
 

@@ -17,20 +17,34 @@ namespace Nettbutikk.Models
         [Key]
         [JsonIgnore]
         public Guid Id { get; set; }
+
         public DateTime DatePlaced { get; set; }
+
         public DateTime? DateFulfilled { get; set; }
+
         public double Price { get; set; }
+
         public string Stage { get; set; }
+
         public bool WantsPartialDelivery { get; set; }
+
+        [ForeignKey("PartialDelivery")]
+        public Guid PartialDeliveryId { get; set; }
+
+        public PartialDelivery PartialDelivery { get; set; }
+
         [JsonIgnore]
         public string UserId { get; set; }
+
         [JsonIgnore]
         public UserEntity User { get; set; }
+
         [JsonIgnore]
         public ICollection<ProductOrderRelation> ProductOrderRelations { get; set; }
 
         [NotMapped]
         private readonly WebStoreContext _webStoreContext;
+
         [NotMapped]
         private readonly ILogger<Order> _errorLogger;
 

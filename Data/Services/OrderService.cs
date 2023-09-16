@@ -187,8 +187,8 @@ namespace Nettbutikk.Data.Services
 
                 if (orderEntity.WantsPartialDelivery && partialDelivery.PartialDeliveryProductRelations.Any())
                 {
-                    partialDelivery.Order = orderEntity;
-                    partialDelivery.OrderId = orderEntity.Id;
+                    orderEntity.PartialDelivery = partialDelivery;
+                    orderEntity.PartialDeliveryId = partialDelivery.Id;
                     partialDelivery.User = user;
                     partialDelivery.UserId = user.Id;
 
