@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Nettbutikk.Data;
+using Nettbutikk.Data.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,18 +16,20 @@ namespace Nettbutikk.Workers
     public class EventListener : BackgroundService
     {
         private readonly WebStoreContext _context;
+        private readonly PartialDeliveryService _partialDeliveryService;
 
-        public EventListener(WebStoreContext context)
+        public EventListener(PartialDeliveryService partialDeliveryService, IServiceScopeFactory serviceScopeFactory)
         {
-            _context = context;
+            _context = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<WebStoreContext>();
+            _partialDeliveryService = partialDeliveryService;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var evts = _context.Events.Where(evt => !evt.IsHandled); // gets unhandled events
-                evts.ToList();
+                var evts = _context.Events.Where(evt => !evt.IsHandled).ToList(); // gets unhandled events
+                Task.Run(async() => await _partialDeliveryService.HandleProductsReceivedForPartialDeliveryEvents(evts));
                 // here we should send the events to some signalR service that can transmit the messages onward to the appropriate receivers
             }
 

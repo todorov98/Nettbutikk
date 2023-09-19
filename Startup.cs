@@ -97,6 +97,7 @@ namespace Nettbutikk
             services.AddTransient<UserContextService>();
             services.AddTransient<DiscountService>();
             services.AddTransient<PartialDeliveryService>();
+            services.AddSingleton<PartialDeliveryHubUserManagerSingleton>();
 
             //factories
             services.AddSingleton<DeleteUserReceiptFactory>();

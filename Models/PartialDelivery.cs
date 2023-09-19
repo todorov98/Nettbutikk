@@ -14,6 +14,7 @@ namespace Nettbutikk.Models
         public Guid Id { get; set; }
         public DateTime Expected { get; set; }
         public DateTime DateCreated { get; set; }
+        public string StageOfOrder { get; set; }
         [JsonIgnore]
         public string UserId { get; set; }
         [JsonIgnore]

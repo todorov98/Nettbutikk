@@ -13,7 +13,7 @@ namespace Nettbutikk.Models.EventModels
         public string EventName { get; set; }
         public string JsonData { get; set; }
         public bool IsHandled { get; set; }
-        public DateTime DateTime { get; set; }
+        public DateTime DateCreated { get; set; }
         public DateTime? WasHandledAt { get; set; }
     }
 }

@@ -11,19 +11,24 @@ namespace Nettbutikk.Factories
 {
     public class EventFactory
     {
-        public Event CreateDeliveryEvent(string eventName, List<Product> products)
+        public Event CreateDeliveryEvent(string eventName, List<Product> products, DateTime? expectedDate = null)
         {
             IEvent evt;
 
             if (eventName.Equals(EventTypes.ProductArrivedEvent))
+            {
                 evt = new ProductArrivedEvent()
                 {
                     DateCreated = DateTime.UtcNow,
                     Products = products
                 };
+            }    
 
             else if (eventName.Equals(EventTypes.DeliveryLateEvent))
             {
+                if (expectedDate is null)
+                    throw new Exception($"DeliveryLateEvent must have an expected date. {expectedDate} can not be null.");
+
                 evt = new DeliveryLateEvent()
                 {
                     Id = Guid.NewGuid(),
@@ -38,7 +43,7 @@ namespace Nettbutikk.Factories
             return new Event()
             {
                 EventName = eventName,
-                DateTime = DateTime.UtcNow,
+                DateCreated = DateTime.UtcNow,
                 IsHandled = false,
                 JsonData = data
             };

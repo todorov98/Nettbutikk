@@ -99,12 +99,13 @@ namespace Nettbutikk.Data.Services
 
         public async Task<CancelOrderConfirmation> CancelOrder(string orderId, UserEntity user)
         {
-            var order = _webStoreContext.Orders.FirstOrDefault(o => o.Id.ToString().Equals(orderId))
+            var order = _webStoreContext.Orders.Include(o => o.PartialDelivery).FirstOrDefault(o => o.Id.ToString().Equals(orderId))
                 ?? throw new Exception("Order not found.");
 
             var cancelConfirmation = order.CancelOrder();
 
             cancelConfirmation.CancelledByAdmin = await _userManager.IsInRoleAsync(user, ApplicationRoles.Admin);
+            order.PartialDelivery.StageOfOrder = OrderStages.Cancelled;
 
             await _webStoreContext.SaveChangesAsync();
             return cancelConfirmation;
